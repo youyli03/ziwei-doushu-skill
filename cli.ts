@@ -10,7 +10,6 @@
 import { generateChart } from './lib/ziwei/algorithm.js';
 import { detectPatterns, getMingGongSummary } from './lib/ziwei/patterns.js';
 import { getSiHuaByStem } from './lib/ziwei/sihua.js';
-import { BRANCHES, STEMS } from './lib/ziwei/constants.js';
 import type { BirthInfo } from './lib/ziwei/types.js';
 
 // ─── 解析命令行参数 ────────────────────────────────────────────
