@@ -12,6 +12,7 @@ import { detectPatterns, getMingGongSummary } from './lib/ziwei/patterns.js';
 import { getSiHuaByStem } from './lib/ziwei/sihua.js';
 import { STAR_DESCRIPTIONS } from './lib/ziwei/constants.js';
 import { STAR_IN_FUQI_GU, MARRIAGE_STARS_BRIEF } from './lib/ziwei/heming-knowledge.js';
+import { STAR_IN_PALACE } from './lib/ziwei/palace-knowledge.js';
 import { searchClassics } from './lib/classics/index.js';
 import type { BirthInfo } from './lib/ziwei/types.js';
 
@@ -127,15 +128,20 @@ for (const p of chart.palaces) {
       const brightness = star.brightness === 'bright' ? '庙旺' : star.brightness === 'dim' ? '陷落' : '平和';
       console.log(`  【${p.name}】${star.name}(${brightness}) — ${desc.keywords} [${desc.nature}/${desc.element}]`);
     }
-    // 夫妻宫专项断语
+    // 通用宫位断语（palace-knowledge 库）
+    const palaceEntry = STAR_IN_PALACE[p.name]?.[star.name];
+    if (palaceEntry) {
+      console.log(`    核心: ${palaceEntry.summary}`);
+      console.log(`    吉: ${palaceEntry.good}`);
+      console.log(`    凶: ${palaceEntry.bad}`);
+      if (palaceEntry.ni_quote) console.log(`    倪师: ${palaceEntry.ni_quote}`);
+    }
+    // 夫妻宫专项断语（heming-knowledge 更详细）
     if (p.name === '夫妻宫' && STAR_IN_FUQI_GU[star.name]) {
       const fq = STAR_IN_FUQI_GU[star.name];
-      console.log(`    婚姻核心: ${fq.summary}`);
-      console.log(`    吉象: ${fq.good}`);
-      console.log(`    凶象: ${fq.bad}`);
       console.log(`    配偶性格: ${fq.spouse_traits}`);
       console.log(`    婚期建议: ${fq.timing}`);
-      if (fq.ni_quote) console.log(`    倪师: ${fq.ni_quote}`);
+      if (fq.ni_quote) console.log(`    倪师补充: ${fq.ni_quote}`);
     } else if (p.name === '夫妻宫' && MARRIAGE_STARS_BRIEF[star.name]) {
       console.log(`    婚姻简述: ${MARRIAGE_STARS_BRIEF[star.name]}`);
     }
