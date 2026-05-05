@@ -12,6 +12,7 @@ import { detectPatterns, getMingGongSummary } from './lib/ziwei/patterns.js';
 import { getSiHuaByStem } from './lib/ziwei/sihua.js';
 import { STAR_DESCRIPTIONS } from './lib/ziwei/constants.js';
 import { STAR_IN_FUQI_GU, MARRIAGE_STARS_BRIEF } from './lib/ziwei/heming-knowledge.js';
+import { searchClassics } from './lib/classics/index.js';
 import type { BirthInfo } from './lib/ziwei/types.js';
 
 // ─── 解析命令行参数 ────────────────────────────────────────────
@@ -137,6 +138,11 @@ for (const p of chart.palaces) {
       if (fq.ni_quote) console.log(`    倪师: ${fq.ni_quote}`);
     } else if (p.name === '夫妻宫' && MARRIAGE_STARS_BRIEF[star.name]) {
       console.log(`    婚姻简述: ${MARRIAGE_STARS_BRIEF[star.name]}`);
+    }
+    // 古籍相关条目
+    const hits = searchClassics(star.name, 3);
+    if (hits.length > 0) {
+      console.log(`    古籍: ${hits.map(h => `[${h.bookTitle}·${h.chapterTitle}] ${h.text.slice(0, 60)}…`).join('\n          ')}`);
     }
   }
 }
