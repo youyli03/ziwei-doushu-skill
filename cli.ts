@@ -10,6 +10,8 @@
 import { generateChart } from './lib/ziwei/algorithm.js';
 import { detectPatterns, getMingGongSummary } from './lib/ziwei/patterns.js';
 import { getSiHuaByStem } from './lib/ziwei/sihua.js';
+import { STAR_DESCRIPTIONS } from './lib/ziwei/constants.js';
+import { STAR_IN_FUQI_GU, MARRIAGE_STARS_BRIEF } from './lib/ziwei/heming-knowledge.js';
 import type { BirthInfo } from './lib/ziwei/types.js';
 
 // ─── 解析命令行参数 ────────────────────────────────────────────
@@ -110,4 +112,31 @@ console.log('── 大限 ─────────────────�
 for (const dx of chart.daXians) {
   const cur = chart.daXians.indexOf(dx) === chart.currentDaXianIndex ? ' ◀ 当前' : '';
   console.log(`  ${dx.startAge}-${dx.endAge}岁  ${dx.palaceName}(${BRANCH_NAMES[dx.palaceBranch]})${cur}`);
+}
+
+// ── 各宫主星知识库断语 ─────────────────────────────────────────
+console.log('');
+console.log('── 各宫主星解读（知识库） ───────────────');
+for (const p of chart.palaces) {
+  const majorStars = p.stars.filter(s => s.type === 'major');
+  if (majorStars.length === 0) continue;
+  for (const star of majorStars) {
+    const desc = STAR_DESCRIPTIONS[star.name];
+    if (desc) {
+      const brightness = star.brightness === 'bright' ? '庙旺' : star.brightness === 'dim' ? '陷落' : '平和';
+      console.log(`  【${p.name}】${star.name}(${brightness}) — ${desc.keywords} [${desc.nature}/${desc.element}]`);
+    }
+    // 夫妻宫专项断语
+    if (p.name === '夫妻宫' && STAR_IN_FUQI_GU[star.name]) {
+      const fq = STAR_IN_FUQI_GU[star.name];
+      console.log(`    婚姻核心: ${fq.summary}`);
+      console.log(`    吉象: ${fq.good}`);
+      console.log(`    凶象: ${fq.bad}`);
+      console.log(`    配偶性格: ${fq.spouse_traits}`);
+      console.log(`    婚期建议: ${fq.timing}`);
+      if (fq.ni_quote) console.log(`    倪师: ${fq.ni_quote}`);
+    } else if (p.name === '夫妻宫' && MARRIAGE_STARS_BRIEF[star.name]) {
+      console.log(`    婚姻简述: ${MARRIAGE_STARS_BRIEF[star.name]}`);
+    }
+  }
 }
