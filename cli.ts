@@ -129,7 +129,18 @@ for (const p of chart.palaces) {
       console.log(`  【${p.name}】${star.name}(${brightness}) — ${desc.keywords} [${desc.nature}/${desc.element}]`);
     }
     // 通用宫位断语（palace-knowledge 库）
-    const palaceEntry = STAR_IN_PALACE[p.name]?.[star.name];
+    // 命盘宫名 "命宫"/"兄弟" 等，知识库用 "命宫"/"兄弟宫"，统一映射
+    const palaceKeyMap: Record<string, string> = {
+      '命宫': '命宫', '兄弟': '兄弟宫', '夫妻': '夫妻宫', '子女': '子女宫',
+      '财帛': '财帛宫', '疾厄': '疾厄宫', '迁移': '迁移宫', '仆役': '交友宫',
+      '官禄': '官禄宫', '田宅': '田宅宫', '福德': '福德宫', '父母': '父母宫',
+    };
+    const palaceKey = palaceKeyMap[p.name] ?? p.name;
+    // 夫妻宫优先用 STAR_IN_FUQI_GU 详细条目
+    const fuqiEntry = p.name === '夫妻' ? STAR_IN_FUQI_GU[star.name] : null;
+    const palaceEntry = fuqiEntry
+      ? { summary: fuqiEntry.summary, good: fuqiEntry.good, bad: fuqiEntry.bad, ni_quote: fuqiEntry.ni_quote }
+      : STAR_IN_PALACE[palaceKey]?.[star.name];
     if (palaceEntry) {
       console.log(`    核心: ${palaceEntry.summary}`);
       console.log(`    吉: ${palaceEntry.good}`);
@@ -137,12 +148,12 @@ for (const p of chart.palaces) {
       if (palaceEntry.ni_quote) console.log(`    倪师: ${palaceEntry.ni_quote}`);
     }
     // 夫妻宫专项断语（heming-knowledge 更详细）
-    if (p.name === '夫妻宫' && STAR_IN_FUQI_GU[star.name]) {
+    if (p.name === '夫妻' && STAR_IN_FUQI_GU[star.name]) {
       const fq = STAR_IN_FUQI_GU[star.name];
       console.log(`    配偶性格: ${fq.spouse_traits}`);
       console.log(`    婚期建议: ${fq.timing}`);
       if (fq.ni_quote) console.log(`    倪师补充: ${fq.ni_quote}`);
-    } else if (p.name === '夫妻宫' && MARRIAGE_STARS_BRIEF[star.name]) {
+    } else if (p.name === '夫妻' && MARRIAGE_STARS_BRIEF[star.name]) {
       console.log(`    婚姻简述: ${MARRIAGE_STARS_BRIEF[star.name]}`);
     }
     // 古籍相关条目
